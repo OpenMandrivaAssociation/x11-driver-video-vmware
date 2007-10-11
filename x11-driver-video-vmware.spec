@@ -1,5 +1,5 @@
 Name: x11-driver-video-vmware
-Version: 10.15.0
+Version: 10.15.2
 Release: %mkrel 1
 Summary: The X.org driver for VMWare(tm)
 Group: System/X11
@@ -20,9 +20,7 @@ Conflicts: xorg-x11-server < 7.0
 %setup -q -n xf86-video-vmware-%{version}
 
 %build
-%configure2_5x	--x-includes=%{_includedir}\
-		--x-libraries=%{_libdir}
-
+%configure2_5x
 %make
 
 %install
