@@ -1,6 +1,6 @@
 Name: x11-driver-video-vmware
-Version: 10.15.2
-Release: %mkrel 4
+Version: 10.16.0
+Release: %mkrel 1
 Summary: The X.org driver for VMWare(tm)
 Group: System/X11
 URL: http://xorg.freedesktop.org
