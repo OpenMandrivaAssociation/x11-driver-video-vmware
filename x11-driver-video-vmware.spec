@@ -1,6 +1,6 @@
 Name: x11-driver-video-vmware
 Version: 11.0.3
-Release: %mkrel 1
+Release: %mkrel 2
 Summary: X.org driver for VMWare(tm)
 Group: System/X11
 URL: http://xorg.freedesktop.org
@@ -12,6 +12,8 @@ BuildRequires: x11-proto-devel >= 1.0.0
 BuildRequires: x11-server-devel >= 1.0.1
 BuildRequires: x11-util-macros >= 1.0.1
 BuildRequires: libdrm-devel
+
+Requires: x11-server-common %(xserver-sdk-abi-requires videodrv)
 
 Conflicts: xorg-x11-server < 7.0
 
