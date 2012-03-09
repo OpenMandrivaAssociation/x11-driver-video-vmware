@@ -1,5 +1,5 @@
 Name: x11-driver-video-vmware
-Version: 11.1.0
+Version: 12.0.0
 Release: 1
 Summary: X.org driver for VMWare(tm)
 Group: System/X11
@@ -32,6 +32,5 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 %files
 %{_libdir}/xorg/modules/drivers/vmware_drv.so
-%{_libdir}/xorg/modules/drivers/vmwlegacy_drv.so
 %{_mandir}/man4/vmware.*
 
