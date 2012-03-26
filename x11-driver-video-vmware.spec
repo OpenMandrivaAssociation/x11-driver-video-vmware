@@ -1,6 +1,6 @@
 Name: x11-driver-video-vmware
 Version: 12.0.2
-Release: 1
+Release: 2
 Summary: X.org driver for VMWare(tm)
 Group: System/X11
 License: MIT
@@ -8,7 +8,7 @@ URL: http://xorg.freedesktop.org
 Source0: http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
  
 BuildRequires: x11-proto-devel >= 1.0.0
-BuildRequires: x11-server-devel >= 1.0.1
+BuildRequires: x11-server-devel >= 1.12
 BuildRequires: x11-util-macros >= 1.0.1
 BuildRequires: libdrm-devel
 
