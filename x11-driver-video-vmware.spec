@@ -6,7 +6,9 @@ Group:		System/X11
 License:	MIT
 URL:		http://xorg.freedesktop.org
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
- 
+Patch0:		vmware-11.0.3-vgahw.patch
+Patch1:		vmware-12.0.1-vgahw.patch
+
 BuildRequires:	x11-proto-devel >= 1.0.0
 BuildRequires:	pkgconfig(xorg-server) >= 1.13
 BuildRequires:	x11-util-macros >= 1.0.1
@@ -21,6 +23,8 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 
 %prep
 %setup -qn xf86-video-vmware-%{version}
+%patch0 -p1 -b .vgahw
+%patch1 -p1 -b .vgahw2
 
 %build
 %configure2_5x
