@@ -28,7 +28,6 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 
 %install
 %makeinstall_std
-find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 %files
 %{_libdir}/xorg/modules/drivers/vmware_drv.so
