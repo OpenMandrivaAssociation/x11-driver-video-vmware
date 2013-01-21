@@ -1,13 +1,13 @@
-%define	gitdate	20120529
+#define	gitdate	20120529
 
 Name:		x11-driver-video-vmware
-Version:	12.0.3
-Release:	0.%{gitdate}.2
+Version:	13.0.0
+Release:	1
 Summary:	X.org driver for VMWare(tm)
 Group:		System/X11
 License:	MIT
 URL:		http://xorg.freedesktop.org
-Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{gitdate}.tar.xz
+Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
 Patch0:		vmware-11.0.3-vgahw.patch
 Patch1:		vmware-12.0.1-vgahw.patch
 
@@ -24,7 +24,7 @@ Conflicts:	xorg-x11-server < 7.0
 x11-driver-video-vmware is the X.org driver for VMWare(tm).
 
 %prep
-%setup -qn xf86-video-vmware-%{gitdate}
+%setup -qn xf86-video-vmware-%{version}
 %patch0 -p1 -b .vgahw~
 %patch1 -p1 -b .vgahw2~
 autoreconf -i
