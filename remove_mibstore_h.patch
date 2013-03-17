@@ -1,0 +1,20 @@
+--- xf86-video-vmware-13.0.0/saa/saa_priv.h~	2013-01-15 18:36:01.000000000 +0000
++++ xf86-video-vmware-13.0.0/saa/saa_priv.h	2013-03-17 13:36:45.523519454 +0000
+@@ -48,7 +48,6 @@
+ #include "pixmapstr.h"
+ #include "windowstr.h"
+ #include "servermd.h"
+-#include "mibstore.h"
+ #include "colormapst.h"
+ #include "gcstruct.h"
+ #include "input.h"
+--- xf86-video-vmware-13.0.0/src/vmware.c~	2013-01-15 18:36:01.000000000 +0000
++++ xf86-video-vmware-13.0.0/src/vmware.c	2013-03-17 13:48:34.019511739 +0000
+@@ -23,7 +23,6 @@
+ #include "xf86Pci.h"		/* pci */
+ 
+ #include "mipointer.h"		/* sw cursor */
+-#include "mibstore.h"		/* backing store */
+ #include "micmap.h"		/* mi color map */
+ #include "vgaHW.h"		/* VGA hardware */
+ #include "fb.h"
