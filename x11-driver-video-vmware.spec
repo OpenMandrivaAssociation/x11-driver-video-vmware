@@ -3,7 +3,7 @@
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
 Version:	13.0.0
-Release:	1
+Release:	2
 Group:		System/X11
 License:	MIT
 Url:		http://xorg.freedesktop.org
