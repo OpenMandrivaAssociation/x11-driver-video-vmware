@@ -18,3 +18,23 @@
  #include "micmap.h"		/* mi color map */
  #include "vgaHW.h"		/* VGA hardware */
  #include "fb.h"
+--- xf86-video-vmware-13.0.0/src/vmware.c~	2013-03-31 19:19:04.397208336 +0200
++++ xf86-video-vmware-13.0.0/src/vmware.c	2013-03-31 20:57:09.737436994 +0200
+@@ -1484,7 +1484,6 @@ VMWAREScreenInit(SCREEN_INIT_ARGS_DECL)
+      * If backing store is to be supported (as is usually the case),
+      * initialise it.
+      */
+-    miInitializeBackingStore(pScreen);
+     xf86SetBackingStore(pScreen);
+     xf86SetSilkenMouse(pScreen);
+ 
+--- xf86-video-vmware-13.0.0/vmwgfx/vmwgfx_driver.c~	2013-01-15 19:36:01.000000000 +0100
++++ xf86-video-vmware-13.0.0/vmwgfx/vmwgfx_driver.c	2013-03-31 20:57:24.311534430 +0200
+@@ -1036,7 +1036,6 @@ drv_screen_init(SCREEN_INIT_ARGS_DECL)
+ 		   (ms->only_hw_presents) ? "enabled" : "disabled");
+     }
+ 
+-    miInitializeBackingStore(pScreen);
+     xf86SetBackingStore(pScreen);
+     xf86SetSilkenMouse(pScreen);
+     miDCInitialize(pScreen, xf86GetPointerScreenFuncs());
