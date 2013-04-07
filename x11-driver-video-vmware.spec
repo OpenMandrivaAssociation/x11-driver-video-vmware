@@ -13,6 +13,7 @@ Patch1:		vmware-12.0.1-vgahw.patch
 Patch2:		remove_mibstore_h.patch
 
 BuildRequires:	pkgconfig(libdrm)
+BuildRequires:	pkgconfig(xatracker)
 BuildRequires:	pkgconfig(xorg-macros)
 BuildRequires:	pkgconfig(xorg-server) >= 1.12
 BuildRequires:	pkgconfig(xproto)
