@@ -35,6 +35,6 @@ autoreconf -i
 %makeinstall_std
 
 %files
+%{_bindir}/vmwarectrl
 %{_libdir}/xorg/modules/drivers/vmware_drv.so
 %{_mandir}/man4/vmware.*
-
