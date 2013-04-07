@@ -34,7 +34,14 @@ autoreconf -i
 %install
 %makeinstall_std
 
+# XXX: this should ultimately rather be handled by ie. XFdrake
+install -d %{buildroot}%{_sysconfdir}/modprobe.d
+tee > %{buildroot}%{_sysconfdir}/modprobe.d/vmwgfx.conf << EOF
+options vmwgfx enable_fbdev=1
+EOF
+
 %files
+%config(noreplace) %{_sysconfdir}/modprobe.d/vmwgfx.conf
 %{_bindir}/vmwarectrl
 %{_libdir}/xorg/modules/drivers/vmware_drv.so
 %{_mandir}/man4/vmware.*
