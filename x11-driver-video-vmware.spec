@@ -10,7 +10,6 @@ Url:		http://xorg.freedesktop.org
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
 Patch0:		vmware-11.0.3-vgahw.patch
 Patch1:		vmware-12.0.1-vgahw.patch
-Patch2:		remove_mibstore_h.patch
 
 BuildRequires:	pkgconfig(libdrm)
 BuildRequires:	pkgconfig(xatracker)
