@@ -1,13 +1,19 @@
 %define _disable_ld_no_undefined 1
+%define git 20131223
 
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
-Version:	13.0.1
-Release:	5
+Version:	13.0.2
+%if %git
+Release:	0.%git.1
+Source0:	xf86-video-vmware-%{git}.tar.xz
+%else
+Release:	1
+Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
+%endif
 Group:		System/X11
 License:	MIT
 Url:		http://xorg.freedesktop.org
-Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
 Patch0:		vmware-11.0.3-vgahw.patch
 Patch1:		vmware-12.0.1-vgahw.patch
 
@@ -22,7 +28,11 @@ Requires:	x11-server-common %(xserver-sdk-abi-requires videodrv)
 x11-driver-video-vmware is the X.org driver for VMWare(tm).
 
 %prep
+%if %git
+%setup -qn xf86-video-vmware
+%else
 %setup -qn xf86-video-vmware-%{version}
+%endif
 %apply_patches
 autoreconf -i
 
