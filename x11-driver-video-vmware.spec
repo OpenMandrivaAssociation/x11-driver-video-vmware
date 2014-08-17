@@ -1,10 +1,10 @@
 %define _disable_ld_no_undefined 1
-%define git 20140521
+%define git 0
 
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
 Version:	13.0.2
-Release:	%{?git:1.%{git}.}1
+Release:	%{?git:0.%{git}.}2
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.xz
 Group:		System/X11
 License:	MIT
@@ -28,7 +28,8 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 autoreconf -i
 
 %build
-%configure2_5x	--enable-vmwarectrl-client
+export CC=gcc
+%configure	--enable-vmwarectrl-client
 %make
 
 %install
