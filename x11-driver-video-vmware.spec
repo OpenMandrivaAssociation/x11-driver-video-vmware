@@ -1,10 +1,10 @@
 %define _disable_ld_no_undefined 1
-%define git 0
+%define git %nil
 
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
 Version:	13.0.2
-Release:	%{?git:0.%{git}.}4
+Release:	%{?git:0.%{git}.}5
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.xz
 Group:		System/X11
 License:	MIT
