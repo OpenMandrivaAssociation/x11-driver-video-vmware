@@ -3,14 +3,12 @@
 
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
-Version:	13.0.2
-Release:	6
-Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.xz
+Version:	13.1.0
+Release:	1
+Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.bz2
 Group:		System/X11
 License:	MIT
 Url:		http://xorg.freedesktop.org
-Patch0:		vmware-11.0.3-vgahw.patch
-Patch1:		vmware-12.0.1-vgahw.patch
 
 BuildRequires:	pkgconfig(libdrm)
 BuildRequires:	pkgconfig(xatracker)
@@ -26,11 +24,10 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 %prep
 %setup -qn xf86-video-vmware-%{version}
 %apply_patches
-autoreconf -i
 
 %build
 export CC=gcc
-%configure	--enable-vmwarectrl-client
+%configure --enable-vmwarectrl-client
 %make
 
 %install
