@@ -15,6 +15,7 @@ BuildRequires:	pkgconfig(xatracker)
 BuildRequires:	pkgconfig(xorg-macros)
 BuildRequires:	pkgconfig(xorg-server) >= 1.18
 BuildRequires:	pkgconfig(xproto)
+BuildRequires:	pkgconfig(libudev)
 Requires:	%{_lib}dri-drivers-vmwgfx
 Requires:	x11-server-common %(xserver-sdk-abi-requires videodrv)
 
