@@ -25,7 +25,6 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 %prep
 %setup -qn xf86-video-vmware-%{version}
 %apply_patches
-[ -e autogen.sh ] && ./autogen.sh
 
 %build
 export CC=gcc
