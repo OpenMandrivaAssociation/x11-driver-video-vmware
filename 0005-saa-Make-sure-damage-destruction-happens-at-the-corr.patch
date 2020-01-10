@@ -1,0 +1,197 @@
+From 79d066da48dddcbdfcf41ecbe29cd96aaae2e11c Mon Sep 17 00:00:00 2001
+From: Thomas Hellstrom <thellstrom@vmware.com>
+Date: Tue, 27 Nov 2018 08:29:06 +0100
+Subject: [PATCH 5/6] saa: Make sure damage destruction happens at the correct
+ location
+
+Incorrect DestroyPixmap wrapping previously made the destruction of damage
+objects typically happen in damageDestroyPixmap(), leaving a dangling
+damage pointer in saa_destroy_pixmap() which was only cleared. However in
+some cases that caused us to leak damage objects.
+
+Rework saa initialization somewhat to make sure saa_destroy_pixmap happens
+before damageDestroyPixmap and destroy the damage object in saa_destroy_pixmap.
+Also add a damage object destruction notifier callback that clears the
+saa pixmap damage pointer should the damage object destruction accidentally
+happen elsewhere.
+
+This makes sure we don't leak damage objects.
+
+Signed-off-by: Thomas Hellstrom <thellstrom@vmware.com>
+Reviewed-by: Deepak Rawat <drawat@vmware.com>
+---
+ saa/saa.c        | 72 ++++++++++++++++++++++++++++++++++++++++++------
+ saa/saa_pixmap.c |  3 +-
+ saa/saa_priv.h   | 10 +++++++
+ 3 files changed, 75 insertions(+), 10 deletions(-)
+
+diff --git a/saa/saa.c b/saa/saa.c
+index be9520e..0d88256 100644
+--- a/saa/saa.c
++++ b/saa/saa.c
+@@ -216,6 +216,27 @@ saa_report_damage(DamagePtr damage, RegionPtr reg, void *closure)
+     DamageEmpty(damage);
+ }
+ 
++/**
++ * saa_notify_destroy_damage - Handle destroy damage notification
++ *
++ * \param damage[in] damage Pointer to damage about to be destroyed
++ * \param closure[in] closure Closure.
++ *
++ * Makes sure that whatever code destroys a damage object clears the
++ * saa_pixmap damage pointer. This is extra protection. Typically
++ * saa_destroy_pixmap should be correct if the various subsystem
++ * DestroyPixmap functions are called in the right order.
++ */
++static void
++saa_notify_destroy_damage(DamagePtr damage, void *closure)
++{
++    PixmapPtr pixmap = (PixmapPtr) closure;
++    struct saa_pixmap *spix = saa_get_saa_pixmap(pixmap);
++
++    if (spix->damage == damage)
++	spix->damage = NULL;
++}
++
+ Bool
+ saa_add_damage(PixmapPtr pixmap)
+ {
+@@ -225,7 +246,7 @@ saa_add_damage(PixmapPtr pixmap)
+     if (spix->damage)
+ 	return TRUE;
+ 
+-    spix->damage = DamageCreate(saa_report_damage, NULL,
++    spix->damage = DamageCreate(saa_report_damage, saa_notify_destroy_damage,
+ 				DamageReportRawRegion, TRUE, pScreen, pixmap);
+     if (!spix->damage)
+ 	return FALSE;
+@@ -590,14 +611,15 @@ saa_set_fallback_debug(ScreenPtr screen, Bool enable)
+ }
+ 
+ /**
+- * saa_close_screen() unwraps its wrapped screen functions and tears down SAA's
+- * screen private, before calling down to the next CloseScreen.
++ * saa_early_close_screen() Makes sure we call saa_destroy_pixmap on the
++ * miScreenInit() pixmap _before_ damageCloseScreen, after which it will
++ * generate an invalid memory access. Also unwraps the functions we
++ * wrapped _after_ DamageSetup().
+  */
+-Bool
+-saa_close_screen(CLOSE_SCREEN_ARGS_DECL)
++static Bool
++saa_early_close_screen(CLOSE_SCREEN_ARGS_DECL)
+ {
+     struct saa_screen_priv *sscreen = saa_screen(pScreen);
+-    struct saa_driver *driver = sscreen->driver;
+ 
+     if (pScreen->devPrivate) {
+ 	/* Destroy the pixmap created by miScreenInit() *before*
+@@ -609,11 +631,26 @@ saa_close_screen(CLOSE_SCREEN_ARGS_DECL)
+ 	pScreen->devPrivate = NULL;
+     }
+ 
++    saa_unwrap_early(sscreen, pScreen, CloseScreen);
++    saa_unwrap(sscreen, pScreen, DestroyPixmap);
++
++    return (*pScreen->CloseScreen) (CLOSE_SCREEN_ARGS);
++}
++
++/**
++ * saa_close_screen() unwraps its wrapped screen functions and tears down SAA's
++ * screen private, before calling down to the next CloseScreen.
++ */
++Bool
++saa_close_screen(CLOSE_SCREEN_ARGS_DECL)
++{
++    struct saa_screen_priv *sscreen = saa_screen(pScreen);
++    struct saa_driver *driver = sscreen->driver;
++
+     saa_unwrap(sscreen, pScreen, CloseScreen);
+     saa_unwrap(sscreen, pScreen, CreateGC);
+     saa_unwrap(sscreen, pScreen, ChangeWindowAttributes);
+     saa_unwrap(sscreen, pScreen, CreatePixmap);
+-    saa_unwrap(sscreen, pScreen, DestroyPixmap);
+     saa_unwrap(sscreen, pScreen, ModifyPixmapHeader);
+     saa_unwrap(sscreen, pScreen, BitmapToRegion);
+ #ifdef RENDER
+@@ -726,15 +763,32 @@ saa_driver_init(ScreenPtr screen, struct saa_driver * saa_driver)
+     saa_wrap(sscreen, screen, ChangeWindowAttributes,
+ 	     saa_change_window_attributes);
+     saa_wrap(sscreen, screen, CreatePixmap, saa_create_pixmap);
+-    saa_wrap(sscreen, screen, DestroyPixmap, saa_destroy_pixmap);
+     saa_wrap(sscreen, screen, ModifyPixmapHeader, saa_modify_pixmap_header);
+-
+     saa_wrap(sscreen, screen, BitmapToRegion, saa_bitmap_to_region);
+     saa_unaccel_setup(screen);
+ #ifdef RENDER
+     saa_render_setup(screen);
+ #endif
+ 
++    /*
++     * Correct saa functionality relies on Damage, so set it up now.
++     * Note that this must happen _after_ wrapping the rendering functionality
++     * so that damage happens outside of saa.
++     */
++    if (!DamageSetup(screen))
++	return FALSE;
++
++    /*
++     * Wrap DestroyPixmap after DamageSetup, so that saa_destroy_pixmap is
++     * called _before_ damageDestroyPixmap. This is to make damageDestroyPixmap
++     * doesn't free objects pointed to by our damage pointers.
++     *
++     * Also wrap an early CloseScreen to perform actions needed to be done
++     * before damageCloseScreen and to unwrap DestroyPixmap correctly.
++     */
++    saa_wrap(sscreen, screen, DestroyPixmap, saa_destroy_pixmap);
++    saa_wrap_early(sscreen, screen, CloseScreen, saa_early_close_screen);
++
+     return TRUE;
+ }
+ 
+diff --git a/saa/saa_pixmap.c b/saa/saa_pixmap.c
+index 0d63091..240d609 100644
+--- a/saa/saa_pixmap.c
++++ b/saa/saa_pixmap.c
+@@ -134,7 +134,8 @@ saa_destroy_pixmap(PixmapPtr pPixmap)
+ 
+ 	REGION_UNINIT(pScreen, &spix->dirty_hw);
+ 	REGION_UNINIT(pScreen, &spix->dirty_shadow);
+-	spix->damage = NULL;
++	if (spix->damage)
++	    DamageDestroy(spix->damage);
+     }
+ 
+     saa_swap(sscreen, pScreen, DestroyPixmap);
+diff --git a/saa/saa_priv.h b/saa/saa_priv.h
+index 08e7902..06ff8f7 100644
+--- a/saa/saa_priv.h
++++ b/saa/saa_priv.h
+@@ -74,6 +74,7 @@ struct saa_screen_priv {
+     struct saa_driver *driver;
+     CreateGCProcPtr saved_CreateGC;
+     CloseScreenProcPtr saved_CloseScreen;
++    CloseScreenProcPtr saved_early_CloseScreen;
+     GetImageProcPtr saved_GetImage;
+     GetSpansProcPtr saved_GetSpans;
+     CreatePixmapProcPtr saved_CreatePixmap;
+@@ -127,6 +128,15 @@ do {								\
+ 	(real)->mem = (priv)->saved_##mem;	\
+ }
+ 
++#define saa_wrap_early(priv, real, mem, func) {		\
++	(priv)->saved_early_##mem = (real)->mem;	\
++	(real)->mem = func;				\
++}
++
++#define saa_unwrap_early(priv, real, mem) {		\
++	(real)->mem = (priv)->saved_early_##mem;	\
++}
++
+ #define saa_swap(priv, real, mem) {\
+ 	CONST_ABI_18_0 void *tmp = (priv)->saved_##mem;		\
+ 	(priv)->saved_##mem = (real)->mem;	\
+-- 
+2.20.1
+
