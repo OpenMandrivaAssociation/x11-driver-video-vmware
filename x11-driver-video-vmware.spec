@@ -21,7 +21,6 @@ Patch7:		0008-vmwgfx-Limit-the-number-of-cliprects-in-a-drm-dirtyf.patch
 Patch8:		0009-vmwgfx-Limit-the-number-of-cliprects-in-a-drm-presen.patch
 Patch9:		0010-vmwgfx-Limit-the-number-of-cliprects-in-a-drm-presen.patch
 Patch10:	0011-vmwgfx-Unify-style-in-scanout_update-and-present-fun.patch
-
 BuildRequires:	pkgconfig(libdrm)
 BuildRequires:	pkgconfig(xatracker)
 BuildRequires:	pkgconfig(xorg-macros)
@@ -30,7 +29,7 @@ BuildRequires:	pkgconfig(xproto)
 BuildRequires:	pkgconfig(libudev)
 Requires:	%{_lib}dri-drivers-vmwgfx
 Requires:	x11-server-common %(xserver-sdk-abi-requires videodrv)
-ExcludeArch: %{armx} %{riscv}
+ExcludeArch:	%{armx} %{riscv}
 
 %description
 x11-driver-video-vmware is the X.org driver for VMWare(tm).
@@ -38,6 +37,10 @@ x11-driver-video-vmware is the X.org driver for VMWare(tm).
 %prep
 %setup -qn xf86-video-vmware-%{version}
 %autopatch -p1
+for i in vmware.c vmware_bootstrap.c vmware.h; do
+    sed -i -e 's/if XSERVER_LIBPCIACCESS/ifdef XSERVER_LIBPCIACCESS/g' src/$i
+    sed -i -e 's/if !XSERVER_LIBPCIACCESS/ifndef XSERVER_LIBPCIACCESS/g' src/$i
+done
 
 %build
 export CC=gcc
