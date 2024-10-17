@@ -8,7 +8,7 @@ Release:	1
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.xz
 Group:		System/X11
 License:	MIT
-Url:		http://xorg.freedesktop.org
+Url:		https://xorg.freedesktop.org
 BuildRequires:	pkgconfig(libdrm)
 BuildRequires:	pkgconfig(xatracker)
 BuildRequires:	pkgconfig(xorg-macros)
