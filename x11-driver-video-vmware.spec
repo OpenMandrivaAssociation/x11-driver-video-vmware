@@ -1,11 +1,12 @@
+%global optflags %{optflags} -fPIC
 %define _disable_ld_no_undefined 1
 %define git %nil
 
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
-Version:	13.4.0
-Release:	2
-Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-vmware-%{version}.tar.xz
+Version:	13.4.0.1
+Release:	1
+Source0:	https://github.com/X11Libre/xf86-video-vmware/archive/refs/tags/xlibre-xf86-video-vmware-%{version}.tar.gz
 Group:		System/X11
 License:	MIT
 Url:		https://xorg.freedesktop.org
@@ -18,25 +19,14 @@ BuildRequires:	pkgconfig(libudev)
 Requires:	%{_lib}dri-drivers-vmwgfx
 #Requires:	x11-server-common %(xserver-sdk-abi-requires videodrv)
 ExclusiveArch:	%{x86_64}
+BuildSystem:	autotools
+BuildOption:	--enable-vmwarectrl-client
 
 %description
 x11-driver-video-vmware is the X.org driver for VMWare(tm).
 
-%prep
-%setup -qn xf86-video-vmware-%{version}
-%autopatch -p1
-for i in vmware.c vmware_bootstrap.c vmware.h; do
-    sed -i -e 's/if XSERVER_LIBPCIACCESS/ifdef XSERVER_LIBPCIACCESS/g' src/$i
-    sed -i -e 's/if !XSERVER_LIBPCIACCESS/ifndef XSERVER_LIBPCIACCESS/g' src/$i
-done
-
-%build
-#export CC=gcc
-%configure --enable-vmwarectrl-client
-%make_build
-
-%install
-%make_install
+%prep -a
+NOCONFIGURE=1 ./autogen.sh
 
 %files
 %{_bindir}/vmwarectrl
