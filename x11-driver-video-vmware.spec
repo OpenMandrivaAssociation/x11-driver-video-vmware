@@ -5,13 +5,13 @@
 Summary:	X.org driver for VMWare(tm)
 Name:		x11-driver-video-vmware
 Version:	13.4.0.1
-Release:	1
+Release:	2
 Source0:	https://github.com/X11Libre/xf86-video-vmware/archive/refs/tags/xlibre-xf86-video-vmware-%{version}.tar.gz
 Group:		System/X11
 License:	MIT
 Url:		https://xorg.freedesktop.org
 BuildRequires:	pkgconfig(libdrm)
-BuildRequires:	pkgconfig(xatracker)
+BuildRequires:	slibtool
 BuildRequires:	pkgconfig(xorg-macros)
 BuildRequires:	pkgconfig(xorg-server)
 BuildRequires:	pkgconfig(xproto)
